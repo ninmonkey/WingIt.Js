@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WingIt.Js - Basic Movement</title>
+    <link rel="stylesheet" href="./css/main.css" type="text/css">
+</head>
+
+<body>
+    <!-- <section>
+        <nav>
+            <ul>
+                <li><a href="./">Go Back</a></li>
+                <li><a href="#" id="cmd-btn-toggle-grid-large">Large / Small</a></li>
+            </ul>
+        </nav>
+    </section> -->
+    <h1>Basic Movement</h1>
+    <section class="canvas-parent parent-context grid-small">
+
+        <canvas id="canvas"></canvas>
+
+    </section>
+
+    <script type="module">
+        import { randomInt } from './../../js/utils.js';
+        // globals
+        window.bag ??= {}
+        console.trace( 'debug enabled globals: ', { bag } )
+    </script>
+</body>
+
+</html>

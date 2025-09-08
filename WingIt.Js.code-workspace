@@ -8,6 +8,7 @@
     "settings": {
         "livePreview.autoRefreshPreview": "On Changes to Saved Files",
         "livePreview.previewDebounceDelay": 20,
+        "livePreview.defaultPreviewPath": "/examples/basic.html",
         "[javascript]": {
             "editor.maxTokenizationLineLength": 2500,
             // "editor.codeLens": false,
@@ -34,20 +35,23 @@
         "javascript.updateImportsOnFileMove.enabled": "always",
         "typescript.enablePromptUseWorkspaceTsdk": false,
         "typescript.format.insertSpaceAfterTypeAssertion": true,
+
     },
+
     "launch": {
         "version": "0.2.0",
         "configurations": [
              {
                 "type": "chrome",
-                "name": "Turtle.js ⁞ 🐛 Attach to External Preview",
+                "name": "WingIt.js ⁞ 🐛 Attach to External Preview",
                 "request": "launch",
-                "url": "http://127.0.0.1:3000/examples/html/grid-example.html",
+                "url": "http://127.0.0.1:3002/examples/basic.html",
                 "presentation": {
                     "hidden": false,
                     "group": "0",
                     "order": 0
-                }
+                },
+                "port": 0
             }
 
         ]
