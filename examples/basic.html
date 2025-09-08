@@ -36,6 +36,10 @@
         const color_boid_fill = "rgb(27, 151, 182)";
 
         const bird = new Boid()
+        const bird2 = new Boid()
+        bird2.FillStyle = 'chocolate'
+        bird2.Position.x = 100
+        bird2.Position.y = 50
         // bird.x = 30
         // bird.y = 30
         // bird.x = 300
@@ -45,24 +49,35 @@
 
         function drawCanvas( )  {
             // first clear all
-            // ctx.fillStyle = color_clear_canvas;
-            // ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.clearRect(0, 0, screen.width, screen.height)
 
-            ctx.fillStyle = color_boid_fill;
-            ctx.fillRect(bird.Position.x, bird.Position.y, bird.Position.x + 10, bird.Position.y + 10);
-
-
+            bird.draw( ctx )
+            bird2.draw( ctx )
         }
+        let start
 
-        function updateGameStep() {
+        function updateGameStep( timestamp ) {
             bird.Position.x += bird.Velocity.x
             bird.Position.y += bird.Velocity.y
+
+            if (start === undefined) {
+                start = timestamp;
+            }
+            const elapsed = timestamp - start;
+
+            // Math.min() is used here to make sure the element stops at exactly 200px
+            const shift = Math.min(0.1 * elapsed, 200300);
+            bird.Position.x = shift
+            // element.style.transform = `translateX(${shift}px)`;
+            if (shift > 200) {
+                bird.Velocity.x = bird.Velocity.x * -2
+                // bird.Velocity.y = 0
+            }
 
             WrapScreenEdge( bird )
             drawCanvas( )
 
-
+            console.info(timestamp)
 
             requestAnimationFrame(updateGameStep)
         }
@@ -76,6 +91,7 @@
         window.bag.bird = bird
         window.bag.ctx = ctx
         console.trace( 'debug enabled globals: ', { bag } )
+        console.info( 'Using Context Attrs', bag.ctx.getContextAttributes() )
 
 
     </script>

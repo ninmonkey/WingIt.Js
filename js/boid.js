@@ -61,7 +61,18 @@ export class Boid {
     get Velocity () { return this.#velocity; }
     // get Acceleration () { return this.#acceleration; }
 
+    draw( context ) {
+        if( context == null ) { throw   new Error('Boid.draw() requires a valid 2D rendering context as an argument'); }
+        context.fillStyle = this.#colorFill;
+        // context.fillRect( this.Position.x,  this.Position.y,  this.Position.x + 4,  this.Position.y + 4);
+        context.fillRect( this.Position.x,  this.Position.y,
+            this.Position.x + 10, this.Position.y + 10);
+    }
+
     toString() {
         return `Boid( Position: ${ this.#position.toString() }, Velocity: ${ this.#velocity.toString() } )`;
+    }
+    set FillStyle( colorString ) {
+        this.#colorFill = colorString;
     }
 }
