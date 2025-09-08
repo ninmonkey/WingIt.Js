@@ -26,9 +26,67 @@
 
     <script type="module">
         import { randomInt } from './../../js/utils.js';
+        import { Boid, Vector2 } from './../../js/boid.js';
         // globals
         window.bag ??= {}
         console.trace( 'debug enabled globals: ', { bag } )
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        const color_clear_canvas = "#464746";
+        const color_boid_fill = "rgb(27, 151, 182)";
+
+        const bird = new Boid()
+        // bird.x = 30
+        // bird.y = 30
+        // bird.x = 300
+        bird.Velocity.x = 5
+        bird.Velocity.y = 1.3
+
+
+        function drawCanvas( )  {
+            // first clear all
+            ctx.fillStyle = color_clear_canvas;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // ctx.fillRect(10, 10, 0, 0);
+            // ctx.closePath()
+            // ctx.fillStyle = '#464746'
+
+            ctx.fillStyle = color_boid_fill;
+            ctx.fillRect(bird.Position.x, bird.Position.y, bird.Position.x + 10, bird.Position.y + 10);
+        }
+
+        function wrapScreenEdge( boid ) {
+            if( boid.Position.x > canvas.width ) {
+                boid.Position.x = 0
+            }
+            if( boid.Position.x < 0 ) {
+                boid.Position.x = canvas.width
+            }
+            if( boid.Position.y > canvas.height ) {
+                boid.Position.y = 0
+            }
+            if( boid.Position.y < 0 ) {
+                boid.Position.y = canvas.height
+            }
+
+        }
+
+
+
+        function updateGameStep() {
+            bird.Position.x += bird.Velocity.x
+            bird.Position.y += bird.Velocity.y
+
+            wrapScreenEdge( bird )
+            drawCanvas( )
+            requestAnimationFrame(updateGameStep)
+        }
+        updateGameStep()
+        requestAnimationFrame(updateGameStep)
+
+        // reset canvas
+
+
     </script>
 </body>
 
