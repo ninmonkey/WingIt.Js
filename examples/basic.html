@@ -26,7 +26,7 @@
 
     <script type="module">
         import { randomInt } from './../../js/utils.js';
-        import { Boid, Vector2 } from './../../js/boid.js';
+        import { Boid, Vector2, WrapScreenEdge } from './../../js/boid.js';
         // globals
         window.bag ??= {}
         console.trace( 'debug enabled globals: ', { bag } )
@@ -55,29 +55,11 @@
             ctx.fillRect(bird.Position.x, bird.Position.y, bird.Position.x + 10, bird.Position.y + 10);
         }
 
-        function wrapScreenEdge( boid ) {
-            if( boid.Position.x > canvas.width ) {
-                boid.Position.x = 0
-            }
-            if( boid.Position.x < 0 ) {
-                boid.Position.x = canvas.width
-            }
-            if( boid.Position.y > canvas.height ) {
-                boid.Position.y = 0
-            }
-            if( boid.Position.y < 0 ) {
-                boid.Position.y = canvas.height
-            }
-
-        }
-
-
-
         function updateGameStep() {
             bird.Position.x += bird.Velocity.x
             bird.Position.y += bird.Velocity.y
 
-            wrapScreenEdge( bird )
+            WrapScreenEdge( bird )
             drawCanvas( )
             requestAnimationFrame(updateGameStep)
         }

@@ -20,6 +20,24 @@ export class Vector2 {
         this.#y = y;
     }
 }
+ export function WrapScreenEdge( boid ) {
+    /**
+     * @description Wraps boid around edges like pac-man or asteroids
+     */
+    if( boid.Position.x > canvas.width ) {
+        boid.Position.x = 0
+    }
+    if( boid.Position.x < 0 ) {
+        boid.Position.x = canvas.width
+    }
+    if( boid.Position.y > canvas.height ) {
+        boid.Position.y = 0
+    }
+    if( boid.Position.y < 0 ) {
+        boid.Position.y = canvas.height
+    }
+}
+
 export class Boid {
     /**
      * @description Represents basic bird/fish/boid in the physics simulation
