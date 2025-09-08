@@ -19,6 +19,9 @@ export class Vector2 {
         this.#x = x;
         this.#y = y;
     }
+    toString() {
+        return `Vector2(${ this.#x }, ${ this.#y })`;
+    }
 }
  export function WrapScreenEdge( boid ) {
     /**
@@ -41,7 +44,7 @@ export class Vector2 {
 export class Boid {
     /**
      * @description Represents basic bird/fish/boid in the physics simulation
-     *
+     * @todo: implement: Width/Radius, Left/Right/Top/Bottom vs (x,y) local origin
      */
     #position = new Vector2( 0.0, 0.0 );
     #velocity = new Vector2( 10.0, 10.0 );
@@ -57,4 +60,8 @@ export class Boid {
     get Position () { return this.#position; }
     get Velocity () { return this.#velocity; }
     // get Acceleration () { return this.#acceleration; }
+
+    toString() {
+        return `Boid( Position: ${ this.#position.toString() }, Velocity: ${ this.#velocity.toString() } )`;
+    }
 }

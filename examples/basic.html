@@ -29,7 +29,7 @@
         import { Boid, Vector2, WrapScreenEdge } from './../../js/boid.js';
         // globals
         window.bag ??= {}
-        console.trace( 'debug enabled globals: ', { bag } )
+
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
         const color_clear_canvas = "#464746";
@@ -45,14 +45,14 @@
 
         function drawCanvas( )  {
             // first clear all
-            ctx.fillStyle = color_clear_canvas;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            // ctx.fillRect(10, 10, 0, 0);
-            // ctx.closePath()
-            // ctx.fillStyle = '#464746'
+            // ctx.fillStyle = color_clear_canvas;
+            // ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, screen.width, screen.height)
 
             ctx.fillStyle = color_boid_fill;
             ctx.fillRect(bird.Position.x, bird.Position.y, bird.Position.x + 10, bird.Position.y + 10);
+
+
         }
 
         function updateGameStep() {
@@ -61,12 +61,21 @@
 
             WrapScreenEdge( bird )
             drawCanvas( )
+
+
+
             requestAnimationFrame(updateGameStep)
         }
-        updateGameStep()
-        requestAnimationFrame(updateGameStep)
+        function InitializePage() {
+            // updateGameStep()
+            requestAnimationFrame(updateGameStep)
+        }
+        window.addEventListener("load", InitializePage)
 
-        // reset canvas
+
+        window.bag.bird = bird
+        window.bag.ctx = ctx
+        console.trace( 'debug enabled globals: ', { bag } )
 
 
     </script>
