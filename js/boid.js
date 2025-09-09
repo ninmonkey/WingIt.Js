@@ -50,6 +50,9 @@ export class Boid {
     #position = new Vector2( 0.0, 0.0 );
     #velocity = new Vector2( 10.0, 10.0 );
     // #acceleration = new Vector2( 0.0, 0.0 );
+    #config = {
+        labelPoints: true,
+    }
 
     #fillStyle = 'rgb(27, 151, 182)'
     #radius = 20
@@ -70,7 +73,6 @@ export class Boid {
          */
         const ctx = context
         if ( ctx == null ) { throw new Error( 'Boid.draw() requires a valid 2D rendering context as an argument' ); }
-        ctx.fillStyle = this.FillStyle;
 
         const gradient = ctx.createConicGradient( 0, 100, 100 );
         const grad_0 = 'hsl(200 100% 50% / .25 )'; // hsl(200 100% 50% )
@@ -79,62 +81,50 @@ export class Boid {
         gradient.addColorStop( 0.50, grad_1 );
         gradient.addColorStop( 1, grad_0 );
 
-        // ctx.fillStyle = 'goldenrod'
-        // ctx.strokeStyle = 'red'
-        ctx.fillStyle = gradient
-        ctx.fillStyle = 'salmon'
-        ctx.fillStyle = 'hsl(200 100% 50% / 1.0'
+        const font_style = {
+            fillStyle: 'rgb( 10% 10% 10% / .65)',
+            font: `bold 1.25rem "Cascadia Code", mono`, // 'bold 2rem serif',
+            // offset: this.Radius * .55,
+            offset: this.Radius * 1.25,
+        }
+
+        ctx.fillStyle = this.FillStyle;
+        ctx.beginPath();
+
         // ctx.fillStyle = 'red'
-        // ctx.strokeStyle = 'red'
-        ctx.strokeStyle = gradient
-        ctx.lineWidth = this.Radius * .5
-        ctx.beginPath();
-        // ctx.arc( this.Position.x, this.Position.y, 5, 0, Math.PI * 2, true );
-        /* arc(x, y, radius, startAngle, endAngle, counterclockwise) */
-        ctx.arc(this.Position.x, this.Position.y, this.Radius, 0, Math.PI * 2, true);
-        ctx.stroke()
-        ctx.fill()
-        ctx.beginPath();
-        ctx.arc( 100, 200, 50, 10, 40, false );
-        ctx.stroke()
-        ctx.fill()
-
-        // ctx.fillRect( this.Position.x,  this.Position.y,  this.Position.x + 4,  this.Position.y + 4);
-
-        ctx.beginPath()
-        ctx.lineWidth = 20
-        ctx.strokeStyle = 'salmon'
-        ctx.arc( 100, 75, 50, 0, 2 * Math.PI );
-        ctx.fillStyle = gradient
+        // ctx.fillStyle = gradient
+        ctx.fillStyle = 'hsl(200 100% 50% / 1.0'
         ctx.fillStyle = 'hsl(200 100% 50% / .75)'
+        ctx.lineWidth = this.Radius * .65 // huge or small ?
+        ctx.lineWidth = this.Radius * 1.25
         ctx.strokeStyle = gradient
 
+        ctx.arc( this.Position.x, this.Position.y, this.Radius,
+            /* startAngle */ 0, /* end angle */  Math.PI * 2, true );
         ctx.stroke()
         ctx.fill()
 
-        labelPoint( ctx, this.Position, {
-            // font: 'bold 2rem serif',
-            // font: 'bold 5rem "fira sans", mono',
-            font: `bold 1rem "Cascadia Code", mono`,
-            fillStyle: 'rgb( 10% 10% 10% / .8)',
-        } );
-
-        labelPoint( ctx, { x: 100, y: 300 }, {
-            font: 'bold 2rem serif'
-        } );
-        labelPoint( ctx, { x: 200, y: 200 } );
-
-
-        // ctx.fillRect( this.Position.x,  this.Position.y,
-        // this.Position.x + 10, this.Position.y + 10);
+        if ( this.#config.labelPoints ) {
+            // const newAt = { x: this.Position.x + this.Radius * 1.5, y: this.Position.y + this.Radius * 1.5, }
+            labelPoint( ctx, this.Position, font_style );
+        }
     }
 
     toString () {
         return `Boid( Position: ${ this.#position.toString() }, Velocity: ${ this.#velocity.toString() } )`;
     }
-    get Radius() { return this.#radius; }
+    get Radius () { return this.#radius; }
     get FillStyle () { return this.#fillStyle; }
     set FillStyle ( colorString ) {
         this.#fillStyle = colorString;
+    }
+
+    get Config () { return this.#config; }
+    setConfig ( updateKeys ) {
+        /**
+         * @description modify config in-place
+         */
+        if( updateKeys == null ) { return }
+        this.#config = { ...this.#config, ...updateKeys };
     }
 }
