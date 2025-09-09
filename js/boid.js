@@ -79,11 +79,12 @@ export class Boid {
         const ctx = context
         if ( ctx == null ) { throw new Error( 'Boid.draw() requires a valid 2D rendering context as an argument' ); }
 
-        const gradient = ctx.createConicGradient( 0, 100, 100 );
-        const grad_0 = 'hsl(200 100% 50% / .25 )'; // hsl(200 100% 50% )
-        const grad_1 = 'hsl(263 100% 50% / .70)'; // hsl(200 100% 50% )
+        const gradient = ctx.createConicGradient( 0, (800), (600) );
+        const grad_0 = 'hsl(200 100% 50% / .35 )'; // hsl(200 100% 50% )
+        const grad_1 = 'hsl(263 100% 50% / .30)'; // hsl(200 100% 50% )
         gradient.addColorStop( 0, grad_0 );
         gradient.addColorStop( 0.50, grad_1 );
+        gradient.addColorStop( 0.750, 'hsl(0.0turn 30% 50% / .35 )' );
         gradient.addColorStop( 1, grad_0 );
 
         const font_style = {
@@ -97,12 +98,15 @@ export class Boid {
         ctx.beginPath();
 
         // ctx.fillStyle = 'red'
-        // ctx.fillStyle = gradient
         ctx.fillStyle = 'hsl(200 100% 50% / 1.0'
         ctx.fillStyle = 'hsl(200 100% 50% / .75)'
-        ctx.lineWidth = this.Radius * .65 // huge or small ?
+        ctx.fillStyle = gradient
         ctx.lineWidth = this.Radius * 1.25
+        ctx.lineWidth = this.Radius * .65 // huge or small ?
+        ctx.lineWidth = this.Radius * .35 // huge or small ?
         ctx.strokeStyle = gradient
+        ctx.strokeStyle = 'hsl(0 0% 0% / 0.3)'
+
 
         ctx.arc( this.Position.x, this.Position.y, this.Radius,
             /* startAngle */ 0, /* end angle */  Math.PI * 2, true );

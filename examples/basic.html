@@ -98,7 +98,7 @@
         window.addEventListener("load", InitializePage)
 
         window.bag.ctx = ctx
-        window.bag = entityList // might go out of sync if re-assigned
+        window.bag.ents = entityList // might go out of sync if re-assigned
         console.trace( 'debug enabled globals: ', { bag } )
         console.info( 'Using Context Attrs', ctx.getContextAttributes() )
     </script>
