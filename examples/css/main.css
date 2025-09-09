@@ -129,8 +129,22 @@ section.parent-context {
 
 canvas#canvas {
     display: inline-block;
-    width: 70vw;
-    aspect-ratio: 16 / 9;
+    /* width: 100%; */
+    max-width: 100%;
+    /* 100% means if the canvas is larger than the viewport, it scales down to fit.
+    the canvas attr width is set to 1024px.
+    this is not the same thing as setting this width here to 1024px. */
+
+    /* width: auto; */
+    /* width: 70vw; */
+    /* width: auto;
+    height: auto; */
+    /* width: 80%; */
+    /* height: auto; */
+    /* height: 500px; */
+    /* width: 80%; */
+    /* height: 300px; */
+    /* aspect-ratio: 1 / 1; */
     margin: auto;
     padding: 0;
     border: none;

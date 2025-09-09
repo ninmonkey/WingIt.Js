@@ -20,13 +20,14 @@
     <h1>Basic Movement</h1>
     <section class="canvas-parent parent-context grid-small">
 
-        <canvas id="canvas"></canvas>
+        <canvas id="canvas" width="800px" height="600px"></canvas>
 
     </section>
 
     <script type="module">
         import { randomInt } from './../../js/utils.js';
         import { Boid, Vector2, WrapScreenEdge } from './../../js/boid.js';
+        // import { labelPoint } from './../../js/drawing.js';
         // globals
         window.bag ??= {}
 
@@ -77,7 +78,7 @@
             WrapScreenEdge( bird )
             drawCanvas( )
 
-            console.info(timestamp)
+            // console.info(timestamp)
 
             requestAnimationFrame(updateGameStep)
         }
