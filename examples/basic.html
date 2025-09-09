@@ -25,11 +25,13 @@
     </section>
 
     <script type="module">
-        import { randomInt, randomNumber } from './../../js/utils.js';
+        import { randomInt, randomNumber, toDegrees, toRadians } from './../../js/utils.js';
         import { Boid, Vector2, WrapScreenEdge } from './../../js/boid.js';
         // import { labelPoint } from './../../js/drawing.js';
         // globals
         window.bag ??= {}
+        window.toDeg = toDegrees
+        window.toRad = toRadians
 
         let entityList = Array.from( [] )
 
@@ -39,45 +41,39 @@
         const color_clear_canvas = "#464746";
         const color_boid_fill = "rgb(27, 151, 182)";
 
-        const bird = new Boid()
-        const bird2 = new Boid()
-        bird2.FillStyle = 'chocolate'
-        bird2.Position.x = 100
-        bird2.Position.y = 50
-        // bird.x = 30
-        // bird.y = 30
-        // bird.x = 300
-        bird.Velocity.x = 5
-        bird.Velocity.y = 1.3
-
         function drawCanvas( )  {
             // first clear all
             ctx.clearRect(0, 0, screen.width, screen.height)
 
-            bird.draw( ctx )
-            bird2.draw( ctx )
+            for( const ent of entityList ) {
+                ent.draw( ctx )
+            }
         }
         let start
 
         function updateGameStep( timestamp ) {
-            bird.Position.x += bird.Velocity.x
-            bird.Position.y += bird.Velocity.y
-
             if (start === undefined) {
                 start = timestamp;
             }
             const elapsed = timestamp - start;
 
-            // Math.min() is used here to make sure the element stops at exactly 200px
-            const shift = Math.min(0.1 * elapsed, 200300);
-            bird.Position.x = shift
-            // element.style.transform = `translateX(${shift}px)`;
-            if (shift > 200) {
-                bird.Velocity.x = bird.Velocity.x * -2
-                // bird.Velocity.y = 0
+            // from:    Math.min() is used here to make sure the element stops at exactly 200px
+            //    const shift = Math.min(0.1 * elapsed, 200);
+            //    bird.Position.x = shift
+            //    element.style.transform = `translateX(${shift}px)`;
+            //    if (shift > 200) {
+            //        bird.Velocity.x = bird.Velocity.x * -2
+            //        // bird.Velocity.y = 0
+            //     }
+
+            for( const ent of entityList ) {
+                ent.Position.x += ent.Velocity.x
+                ent.Position.y += ent.Velocity.y
+
+                WrapScreenEdge( ent, canvas )
             }
 
-            WrapScreenEdge( bird )
+            // WrapScreenEdge( bird )
             drawCanvas( )
 
             // console.info(timestamp)
@@ -86,18 +82,25 @@
         }
         function InitializePage() {
             // updateGameStep()
+            let i
+            for( i = 0; i < 13; i++ ) {
+                const b = new Boid()
+                b.Position.x = randomInt( 0, canvas.width )
+                b.Position.y = randomInt( 0, canvas.height )
+                b.Velocity.x = randomNumber( -5, 5 )
+                b.Velocity.y = randomNumber( -5, 5 )
+                entityList.push( b )
+            }
+            console.log( { i: i } )
+
             requestAnimationFrame(updateGameStep)
         }
         window.addEventListener("load", InitializePage)
 
-
-        window.bag.bird = bird
         window.bag.ctx = ctx
         window.bag = entityList // might go out of sync if re-assigned
         console.trace( 'debug enabled globals: ', { bag } )
-        console.info( 'Using Context Attrs', bag.ctx.getContextAttributes() )
-
-
+        console.info( 'Using Context Attrs', ctx.getContextAttributes() )
     </script>
 </body>
 
