@@ -1,4 +1,5 @@
 import { labelPoint } from './drawing.js';
+import { toDegrees, toRadians } from './utils.js';
 export class Vector2 {
     /**
      * @description Represents a 2D vector
@@ -24,10 +25,14 @@ export class Vector2 {
         return `Vector2(${ this.#x }, ${ this.#y })`;
     }
 }
-export function WrapScreenEdge ( boid ) {
+export function WrapScreenEdge ( boid, canvas ) {
     /**
      * @description Wraps boid around edges like pac-man or asteroids
      */
+    if( canvas == null ) {
+        console.error( 'WrapScreenEdge requires a global canvas variable' )
+        return;
+    }
     if ( boid.Position.x > canvas.width ) {
         boid.Position.x = 0
     }

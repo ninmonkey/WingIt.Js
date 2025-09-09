@@ -25,11 +25,14 @@
     </section>
 
     <script type="module">
-        import { randomInt } from './../../js/utils.js';
+        import { randomInt, randomNumber } from './../../js/utils.js';
         import { Boid, Vector2, WrapScreenEdge } from './../../js/boid.js';
         // import { labelPoint } from './../../js/drawing.js';
         // globals
         window.bag ??= {}
+
+        let entityList = Array.from( [] )
+
 
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
@@ -46,7 +49,6 @@
         // bird.x = 300
         bird.Velocity.x = 5
         bird.Velocity.y = 1.3
-
 
         function drawCanvas( )  {
             // first clear all
@@ -91,6 +93,7 @@
 
         window.bag.bird = bird
         window.bag.ctx = ctx
+        window.bag = entityList // might go out of sync if re-assigned
         console.trace( 'debug enabled globals: ', { bag } )
         console.info( 'Using Context Attrs', bag.ctx.getContextAttributes() )
 
