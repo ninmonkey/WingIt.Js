@@ -205,3 +205,38 @@ export class Boid {
         this.#config = { ...this.#config, ...updateKeys };
     }
 }
+
+export function BounceScreenEdge ( entities, canvas ) {
+    /**
+     * @summary Bounce boids off edges of canvas to keep them in bounds
+     * @param entities {Array<Boid>} array of Boid instances
+     * @param canvas {HTMLCanvasElement} canvas element to use for bounds
+     * @description this uses center coordinates for circles
+     */
+    for ( const ent of entities ) {
+        const newX = ent.Position.x + ent.Velocity.x  // * timestamp
+        const newY = ent.Position.y + ent.Velocity.y  // * timestamp
+
+        const newPos = ent.Position.Add( ent.Velocity )
+        const isOnScreen = TestIsOnScreen( newPos, ent.Radius * 0, canvas ) // 0 tests center coord, (ent.Radius * 2) tests outside, etc...
+        if ( isOnScreen ) {
+            ent.Position.fromVector( newPos )
+            continue
+        }
+        if ( newPos.x >= canvas.width ) {
+            newPos.x = canvas.width
+            if ( ent.Velocity.x > 0 ) { ent.Velocity.x *= -1 }
+        } else if ( newPos.x <= 0 ) {
+            newPos.x = 0
+            if ( ent.Velocity.x < 0 ) { ent.Velocity.x *= -1 }
+        }
+        if ( newPos.y <= 0 ) {
+            newPos.y = 0
+            if ( ent.Velocity.y < 0 ) { ent.Velocity.y *= -1 }
+        } else if ( newPos.y >= canvas.height ) {
+            newPos.y = canvas.height
+            if ( ent.Velocity.y > 0 ) { ent.Velocity.y *= -1 }
+        }
+        ent.Position.fromVector( newPos )
+    }
+}
