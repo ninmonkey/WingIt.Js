@@ -8,7 +8,7 @@
     "settings": {
         "livePreview.autoRefreshPreview": "On Changes to Saved Files",
         "livePreview.previewDebounceDelay": 20,
-        "livePreview.defaultPreviewPath": "/examples/basic.html",
+        "livePreview.defaultPreviewPath": "/examples/basic.bounce.html",
         "[javascript]": {
             "editor.maxTokenizationLineLength": 2500,
             // "editor.codeLens": false,
@@ -45,7 +45,7 @@
                 "type": "chrome",
                 "name": "WingIt.js ⁞ 🐛 Attach to External Preview",
                 "request": "launch",
-                "url": "http://127.0.0.1:3002/examples/basic.html",
+                "url": "http://127.0.0.1:3002/examples/basic.bounce.html",
                 "presentation": {
                     "hidden": false,
                     "group": "0",

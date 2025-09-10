@@ -17,7 +17,7 @@
             </ul>
         </nav>
     </section> -->
-    <h1>Basic Movement</h1>
+    <h1>Wrap Screen and No Steering</h1>
     <section class="canvas-parent parent-context grid-small">
 
         <canvas id="canvas" width="800px" height="600px"></canvas>
@@ -26,15 +26,18 @@
 
     <script type="module">
         import { randomInt, randomNumber, toDegrees, toRadians } from './../../js/utils.js';
-        import { Boid, Vector2, WrapScreenEdge } from './../../js/boid.js';
+        import { Boid, Vector2, WrapScreenEdge, BounceScreenEdge } from './../../js/boid.js';
         // import { labelPoint } from './../../js/drawing.js';
         // globals
+        const appConfig = {
+            spawnCount: 20,
+            alwaysClearScreen: true,
+        }
         window.bag ??= {}
         window.toDeg = toDegrees
         window.toRad = toRadians
 
         let entityList = Array.from( [] )
-
 
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
@@ -42,8 +45,9 @@
         const color_boid_fill = "rgb(27, 151, 182)";
 
         function drawCanvas( )  {
-            // first clear all
-            ctx.clearRect(0, 0, screen.width, screen.height)
+            if( appConfig.alwaysClearScreen ) {
+                ctx.clearRect(0, 0, screen.width, screen.height)
+            }
 
             for( const ent of entityList ) {
                 ent.draw( ctx )
@@ -52,38 +56,29 @@
         let start
 
         function updateGameStep( timestamp ) {
+            // todo: ensure timestep is increased by a fixed timestep to ensure stable physics simulations
             if (start === undefined) {
                 start = timestamp;
             }
             const elapsed = timestamp - start;
-
-            // from:    Math.min() is used here to make sure the element stops at exactly 200px
-            //    const shift = Math.min(0.1 * elapsed, 200);
-            //    bird.Position.x = shift
-            //    element.style.transform = `translateX(${shift}px)`;
-            //    if (shift > 200) {
-            //        bird.Velocity.x = bird.Velocity.x * -2
-            //        // bird.Velocity.y = 0
-            //     }
+            // const timestepMod = 1 / 1000
 
             for( const ent of entityList ) {
-                ent.Position.x += ent.Velocity.x
-                ent.Position.y += ent.Velocity.y
+                ent.Position.x += ent.Velocity.x // * timestepMod  / 1000
+                ent.Position.y += ent.Velocity.y // * timestepMod / 1000
 
                 WrapScreenEdge( ent, canvas )
             }
 
-            // WrapScreenEdge( bird )
             drawCanvas( )
-
             // console.info(timestamp)
-
             requestAnimationFrame(updateGameStep)
         }
+
         function InitializePage() {
             // updateGameStep()
             let i
-            for( i = 0; i < 13; i++ ) {
+            for( i = 0; i < appConfig.spawnCount; i++ ) {
                 const b = new Boid()
                 b.Position.x = randomInt( 0, canvas.width )
                 b.Position.y = randomInt( 0, canvas.height )

@@ -7,30 +7,82 @@ export class Vector2 {
      */
     #x = 0
     #y = 0
-    constructor( x = 0, y = 0 ) {
-        this.Position( x, y )
+    constructor( x = 0.0, y = 0.0 ) {
+        // this.setLoc( x, y )
+        this.fromCoord( x, y )
     }
     set x ( value ) { this.#x = value; }
     get x () { return this.#x; }
     set y ( value ) { this.#y = value; }
     get y () { return this.#y; }
-    get Position () {
-        return { x: this.#x, y: this.#y };
+    get Position () { return { x: this.#x, y: this.#y }; }
+    set Position ( newPos ) {
+        // ignore value isn't a vector?
+        // const [ x, y ] = newPos
+        const x = newPos.x
+        const y = newPos.y
+        if ( x !== undefined ) { this.#x = x; }
+        if ( y !== undefined ) { this.#y = y; }
+        // if( newPos instanceof Vector2 ) {
+        //     this.#x = newPos.x;
+        //     this.#y = newPos.y;
+        // }
     }
-    Position ( x = 0, y = 0 ) {
+
+    Add ( vector ) {
+        /**
+         * @description Vector operation for addition. returns a new Vector2 instance / immutable
+         * @param vector {Vector2} another Vector2 instance
+         * @example const newPos = boid.Position.add( boid.Velocity ) // returns the new vector without changing `boid.Position`
+         */
+        if ( !( vector instanceof Vector2 ) ) {
+            throw new Error( 'Vector2.Add requires a Vector2 as an argument' )
+        }
+        return new Vector2( this.#x + vector.x, this.#y + vector.y )
+    }
+    fromCoord ( x, y ) {
+        /**
+         * @summary Mutates vector in-place to the new position
+         * @param x {number} x coordinate
+         * @param y {number} y coordinate
+         * @example boid.Position.fromCoord( 100, 200 )
+         */
+        if ( typeof x !== 'number' || typeof y !== 'number' ) {
+            throw new Error( 'Vector2.fromCoord requires two numbers as arguments' )
+        }
         this.#x = x;
         this.#y = y;
     }
+    fromVector ( vector ) {
+        /**
+         * @summary Mutates vector in-place to the new position
+         * @param vector {Vector2|Object} another Vector2 or object with numeric x,y properties
+         * @example boid.Position.fromVector( new Vector2( 100, 200 ) )
+         */
+        if ( vector instanceof Vector2 ) {
+            this.#x = vector.x;
+            this.#y = vector.y;
+            return;
+        }
+        if ( vector && typeof vector.x === 'number' && typeof vector.y === 'number' ) {
+            this.#x = vector.x;
+            this.#y = vector.y;
+            return;
+        }
+        throw new Error( 'Vector2.fromVector requires a Vector2 or an object with numeric x,y properties' );
+    }
+
     toString () {
-        return `Vector2(${ this.#x }, ${ this.#y })`;
+        return `Vector2( ${ this.#x.toFixed( 2 ) }, ${ this.#y.toFixed( 2 ) } )`;
     }
 }
 export function WrapScreenEdge ( boid, canvas ) {
     /**
      * @description Wraps boid around edges like pac-man or asteroids
+     * @summary note that this uses center coordinate, no radius/width/height
      */
-    if( canvas == null ) {
-        console.error( 'WrapScreenEdge requires a global canvas variable' )
+    if ( canvas == null ) {
+        console.error( `'canvas' was null!` )
         return;
     }
     if ( boid.Position.x > canvas.width ) {
@@ -44,6 +96,68 @@ export function WrapScreenEdge ( boid, canvas ) {
     }
     if ( boid.Position.y < 0 ) {
         boid.Position.y = canvas.height
+    }
+}
+
+export function TestIsOnScreen ( position, radius, canvas ) {
+    /**
+     * @description Test if boid is on "screen" (inside canvas bounds).
+     * @returns {boolean} true if boid plus radius is off-screen. partially visible returns true
+     */
+    if ( canvas == null ) {
+        console.error( `'canvas' was null!` )
+        return false;
+    }
+    if ( position.x + radius < 0 ) { return false }
+    if ( position.x - radius >= canvas.width ) { return false }
+    if ( position.y + radius < 0 ) { return false }
+    if ( position.y - radius >= canvas.height ) { return false }
+    return true
+}
+export function BounceScreenEdge ( boid, canvas ) {
+    /**
+     * @description Bounce off walls. warning: needs to test steps before tunneling, preventing them from getting stuck flipping signs
+     */
+    if ( canvas == null ) {
+        console.error( 'WrapScreenEdge requires a global canvas variable' )
+        return;
+    }
+    if ( boid.Position.x - boid.Radius <= 0 ) {
+        if ( boid.Velocity.x < 0 ) { boid.Velocity.x *= -1; }
+    }
+    if ( boid.Position.x + boid.radius >= canvas.width ) {
+        if ( boid.Velocity.x > 0 ) { boid.Velocity.x *= -1; }
+        boid.Position.x = canvas.width - boid.Radius - 200
+        boid.Position.x -= canvas.width - boid.Radius - 200
+        boid.Position.x = 300
+        boid.Velocity.x = 0
+        // if( boid.Velocity.x > 0 ) { boid.Velocity.x *= -1; }
+        // boid.Position.x = 187
+        //     // boid.Position.x = 600
+    }
+    // boid.Velocity. *= -1
+    // if( boid.Position.x + boid.radius > canvas.width )  {
+    // if( boid.Velocity.x > 0 ) { boid.Velocity.x *= -1; }
+    // boid.Position.x = 600
+    // }
+    return
+    if ( false ) {
+        if ( boid.Position.x + boid.Radius >= canvas.width + 10 ) {
+            boid.Position.x = canvas.width - boid.Radius - 1
+            boid.velocity.x *= -1
+        }
+        if ( boid.Position.x < 0 ) {
+            boid.Position.x = 0 + boid.Radius + 1
+            boid.velocity.x *= -1
+        }
+        if ( boid.Position.y >= canvas.height ) {
+            boid.Position.y = canvas.height - boid.Radius - 1
+            boid.velocity.y *= -1
+        }
+        if ( boid.Position.y < 0 ) {
+            boid.Position.y = 0 + boid.Radius + 1
+            boid.velocity.y *= -1
+        }
     }
 }
 
@@ -79,7 +193,7 @@ export class Boid {
         const ctx = context
         if ( ctx == null ) { throw new Error( 'Boid.draw() requires a valid 2D rendering context as an argument' ); }
 
-        const gradient = ctx.createConicGradient( 0, (800), (600) );
+        const gradient = ctx.createConicGradient( 0, ( 800 ), ( 600 ) );
         const grad_0 = 'hsl(200 100% 50% / .35 )'; // hsl(200 100% 50% )
         const grad_1 = 'hsl(263 100% 50% / .30)'; // hsl(200 100% 50% )
         gradient.addColorStop( 0, grad_0 );
@@ -133,7 +247,7 @@ export class Boid {
         /**
          * @description modify config in-place
          */
-        if( updateKeys == null ) { return }
+        if ( updateKeys == null ) { return }
         this.#config = { ...this.#config, ...updateKeys };
     }
 }
