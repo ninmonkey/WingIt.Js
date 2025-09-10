@@ -30,7 +30,7 @@
         // import { labelPoint } from './../../js/drawing.js';
         // globals
         const appConfig = {
-            spawnCount: 20,
+            spawnCount: 40,
             alwaysClearScreen: true,
         }
         window.bag ??= {}
@@ -39,70 +39,85 @@
 
         let entityList = Array.from( [] )
 
-        const canvas = document.getElementById("canvas");
-        const ctx = canvas.getContext("2d");
+        const canvas = document.getElementById( "canvas" );
+        const ctx = canvas.getContext( "2d" );
         const color_clear_canvas = "#464746";
         const color_boid_fill = "rgb(27, 151, 182)";
 
-        function drawCanvas( )  {
-            if( appConfig.alwaysClearScreen ) {
-                ctx.clearRect(0, 0, screen.width, screen.height)
+        function drawCanvas () {
+            if ( appConfig.alwaysClearScreen ) {
+                ctx.clearRect( 0, 0, screen.width, screen.height )
             }
 
-            for( const ent of entityList ) {
+            for ( const ent of entityList ) {
                 ent.draw( ctx )
             }
         }
         let start
 
-        function updateGameStep( timestamp ) {
+        function updateGameStep ( timestamp ) {
             // todo: ensure timestep is increased by a fixed timestep to ensure stable physics simulations
-            if (start === undefined) {
+            if ( start === undefined ) {
                 start = timestamp;
             }
             const elapsed = timestamp - start;
-            const timestepMod = (elapsed) / 1000
+            const timestepMod = ( elapsed ) / 1000
 
-            for( const ent of entityList ) {
-                const newX = ent.Position.x + ent.Velocity.x // * timestepMod
-                const newY = ent.Position.y + ent.Velocity.y // * timestepMod
+            for ( const ent of entityList ) {
+                const newX = ent.Position.x + ent.Velocity.x  // * timestepMod
+                const newY = ent.Position.y + ent.Velocity.y  // * timestepMod
 
-                const newPos = new Vector2( newX, newY )
-                const isOnScreen = TestIsOnScreen( newPos, ent.Radius, canvas )
-                if( isOnScreen ) {
-                    // ent.Position = newPos
-                    ent.Position.fromCoord( newX, newY )
-                } else {
-                    ent.Position.fromVector(  { x: 200, y: 200 } )
+                const newPos = ent.Position.Add( ent.Velocity )
+                const isOnScreen = TestIsOnScreen( newPos, ent.Radius * 0, canvas ) // 0 tests center coord, (ent.Radius * 2) tests outside, etc...
+                if ( isOnScreen ) {
+                    ent.Position.fromVector( newPos )
+                    continue
                 }
-
-                // ent.Position.y += ent.Velocity.y // * timestepMod
-
-
-                // BounceScreenEdge( ent, canvas )
+                if( newPos.x >= canvas.width ) {
+                    newPos.x = canvas.width
+                    if( ent.Velocity.x > 0 ) { ent.Velocity.x *= -1 }
+                } else if( newPos.x <= 0 ) {
+                    newPos.x = 0
+                    if( ent.Velocity.x < 0 ) { ent.Velocity.x *= -1 }
+                }
+                if( newPos.y <= 0 ) {
+                    newPos.y = 0
+                    if( ent.Velocity.y < 0 ) { ent.Velocity.y *= -1 }
+                } else if( newPos.y >= canvas.height ) {
+                    newPos.y = canvas.height
+                    if( ent.Velocity.y > 0 ) { ent.Velocity.y *= -1 }
+                }
+                ent.Position.fromVector( newPos )
             }
 
-            drawCanvas( )
+            drawCanvas()
             // console.info(timestamp)
-            requestAnimationFrame(updateGameStep)
+            requestAnimationFrame( updateGameStep )
         }
 
-        function InitializePage() {
+        function InitializePage () {
             // updateGameStep()
             let i
-            for( i = 0; i < appConfig.spawnCount; i++ ) {
+            for ( i = 0; i < appConfig.spawnCount; i++ ) {
                 const b = new Boid()
-                b.Position.x = randomInt( 0, canvas.width )
-                b.Position.y = randomInt( 0, canvas.height )
-                b.Velocity.x = randomNumber( -3, 3 )
-                b.Velocity.y = randomNumber( -1, 1 )
+                const maxVel = 3
+
+                b.Radius = randomInt( 10, 20 )
+                b.Position.fromCoord(
+                   randomInt( 0, canvas.width ),
+                   randomInt( 0, canvas.height ) )
+
+                b.Velocity.fromCoord(
+                    randomNumber( -maxVel, maxVel ),
+                    randomNumber( -maxVel, maxVel ) )
+
                 entityList.push( b )
             }
             console.log( { i: i } )
 
-            requestAnimationFrame(updateGameStep)
+            requestAnimationFrame( updateGameStep )
         }
-        window.addEventListener("load", InitializePage)
+        window.addEventListener( "load", InitializePage )
 
         window.bag.ctx = ctx
         window.bag.ents = entityList // might go out of sync if re-assigned

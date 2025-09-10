@@ -236,6 +236,7 @@ export class Boid {
     toString () {
         return `Boid( Position: ${ this.#position.toString() }, Velocity: ${ this.#velocity.toString() } )`;
     }
+    set Radius ( radius ) { this.#radius = radius; }
     get Radius () { return this.#radius; }
     get FillStyle () { return this.#fillStyle; }
     set FillStyle ( colorString ) {

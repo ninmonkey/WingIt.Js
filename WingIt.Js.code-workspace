@@ -35,6 +35,9 @@
         "javascript.updateImportsOnFileMove.enabled": "always",
         "typescript.enablePromptUseWorkspaceTsdk": false,
         "typescript.format.insertSpaceAfterTypeAssertion": true,
+        "cSpell.words": [
+            "Boid"
+        ],
 
     },
 
