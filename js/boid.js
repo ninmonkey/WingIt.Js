@@ -114,53 +114,6 @@ export function TestIsOnScreen ( position, radius, canvas ) {
     if ( position.y - radius >= canvas.height ) { return false }
     return true
 }
-export function BounceScreenEdge ( boid, canvas ) {
-    /**
-     * @description Bounce off walls. warning: needs to test steps before tunneling, preventing them from getting stuck flipping signs
-     */
-    if ( canvas == null ) {
-        console.error( 'WrapScreenEdge requires a global canvas variable' )
-        return;
-    }
-    if ( boid.Position.x - boid.Radius <= 0 ) {
-        if ( boid.Velocity.x < 0 ) { boid.Velocity.x *= -1; }
-    }
-    if ( boid.Position.x + boid.radius >= canvas.width ) {
-        if ( boid.Velocity.x > 0 ) { boid.Velocity.x *= -1; }
-        boid.Position.x = canvas.width - boid.Radius - 200
-        boid.Position.x -= canvas.width - boid.Radius - 200
-        boid.Position.x = 300
-        boid.Velocity.x = 0
-        // if( boid.Velocity.x > 0 ) { boid.Velocity.x *= -1; }
-        // boid.Position.x = 187
-        //     // boid.Position.x = 600
-    }
-    // boid.Velocity. *= -1
-    // if( boid.Position.x + boid.radius > canvas.width )  {
-    // if( boid.Velocity.x > 0 ) { boid.Velocity.x *= -1; }
-    // boid.Position.x = 600
-    // }
-    return
-    if ( false ) {
-        if ( boid.Position.x + boid.Radius >= canvas.width + 10 ) {
-            boid.Position.x = canvas.width - boid.Radius - 1
-            boid.velocity.x *= -1
-        }
-        if ( boid.Position.x < 0 ) {
-            boid.Position.x = 0 + boid.Radius + 1
-            boid.velocity.x *= -1
-        }
-        if ( boid.Position.y >= canvas.height ) {
-            boid.Position.y = canvas.height - boid.Radius - 1
-            boid.velocity.y *= -1
-        }
-        if ( boid.Position.y < 0 ) {
-            boid.Position.y = 0 + boid.Radius + 1
-            boid.velocity.y *= -1
-        }
-    }
-}
-
 export class Boid {
     /**
      * @description Represents basic bird/fish/boid in the physics simulation
