@@ -25,12 +25,20 @@
     </section>
 
     <script type="module">
-        import { randomInt, randomNumber, toDegrees, toRadians } from './../../js/utils.js';
-        import { Boid, Vector2, WrapScreenEdge, TestIsOnScreen, BounceScreenEdge, debugLogBoidStates } from './../../js/boid.js';
+        import { randomInt, randomNumber, toDegrees, toRadians, randomAngle, randomAngleOffset } from './../../js/utils.js';
+        import {
+            Boid,
+            BounceScreenEdge,
+            debugLogBoidStates,
+            TestIsOnScreen,
+            Vector2,
+            WrapScreenEdge,
+        } from './../../js/boid.js';
         // import { labelPoint } from './../../js/drawing.js';
         // globals
         const appConfig = {
             spawnCount: 7,
+            spawnWithMass: false, // does random velocity takes radius into account?
             alwaysClearScreen: true,
         }
         window.bag ??= {}
@@ -70,35 +78,56 @@
             requestAnimationFrame( updateGameStep )
         }
 
-
         function InitializePage () {
             // updateGameStep()
             let i
+            const randAngle = randomAngle()
+            const maxVel = 4
+
             for ( i = 0; i < appConfig.spawnCount; i++ ) {
                 const b = new Boid()
-                const maxVel = 3
 
-                b.Radius = randomInt( 10, 20 )
+                b.Radius = randomInt( 10, 30 )
                 b.Position.fromCoord(
                     randomInt( 0, canvas.width ),
                     randomInt( 0, canvas.height ) )
 
-                b.Velocity.fromCoord(
-                    randomNumber( -maxVel, maxVel ),
-                    randomNumber( -maxVel, maxVel ) )
+                // b.Velocity.fromAngle( randomAngle(), 4 ).scale( 0.5 )
+                b.Velocity.fromAngle( randomAngle(),
+                    randomNumber( maxVel / 10, maxVel ) )
 
-                // b.Velocity.normalize()
-                // b.Velocity.normalize().scale( 0.4 )
+                if( appConfig.spawnWithMass ) {
+                    if ( b.Radius > 20 ) { b.Velocity.scale( 0.3 ) } else { b.Velocity.scale( 4 ) }
+                }
 
                 entityList.push( b )
             }
-            console.log( { i: i } )
-
-            debugLogBoidStates( entityList, 'table'  )
-
+            console.info( `spawned ${i} boids` )
+            debugLogBoidStates( entityList, 'table' )
             requestAnimationFrame( updateGameStep )
         }
         window.addEventListener( "load", InitializePage )
+        canvas.addEventListener( 'mousemove', ( e ) => {
+            const rect = canvas.getBoundingClientRect()
+            const mouseX = e.clientX - rect.left
+            const mouseY = e.clientY - rect.top
+            // console.log( { mouseX, mouseY } )
+
+            console.info( { kind: 'mousemove', evt: e, mouseX, mouseY } )
+            for ( const b of entityList ) {
+                const desired = new Vector2().fromCoord( mouseX, mouseY )
+                    .subtract( b.Position )
+                    .normalize()
+                    .scale( 0.5 ) // max speed
+
+                const steer = desired.clone()
+                    .subtract( b.Velocity )
+                    .limit( 0.1 ) // max force
+
+                b.Velocity.add( steer )
+                // b.Velocity.limit( 3 ) // max speed
+            }
+        } )
 
         window.bag.ctx = ctx
         window.bag.ents = entityList // might go out of sync if re-assigned

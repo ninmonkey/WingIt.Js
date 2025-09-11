@@ -20,6 +20,25 @@ export function randomNumber ( min, max ) {
     return Math.random() * ( max - min ) + min;
 }
 
+export function randomAngle() {
+    /**
+     * @description Returns a random angle in radians
+     * @returns {number} Random angle in radians
+     */
+    return Math.random() * 2 * Math.PI;
+}
+
+export function randomAngleOffset( angle, offset ) {
+    /**
+     * @description Returns a random angle in radians within the range: [ angle - offset, angle + offset )
+     * @param {number} angle Center angle in radians
+     * @param {number} offset Offset from center angle in radians
+     * @returns {number} Random angle in radians within the range: [ angle - offset, angle + offset )
+     */
+    return angle + randomNumber( -offset, offset );
+}
+
+
 export function toDegrees ( radians ) {
     /**
      * @description Converts degrees to radians

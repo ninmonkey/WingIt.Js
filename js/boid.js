@@ -87,6 +87,7 @@ export class Vector2 {
         }
         this.#x = x;
         this.#y = y;
+        // # is return this implicit?
     }
     fromVector ( vector ) {
         /**
@@ -105,6 +106,16 @@ export class Vector2 {
             return;
         }
         throw new Error( 'Vector2.fromVector requires a Vector2 or an object with numeric x,y properties' );
+    }
+    fromAngle( angle, distance = 1 ) {
+        /**
+         * @description Sets vector from an angle and distance
+         * @param {number} angle The angle in radians
+         * @param {number} distance The length of the vector (default: 1)
+         */
+        this.#x = Math.cos( angle ) * distance;
+        this.#y = Math.sin( angle ) * distance;
+        return this;
     }
 
     toString () {
@@ -155,7 +166,7 @@ export class Boid {
      * @todo: implement: Width/Radius, Left/Right/Top/Bottom vs (x,y) local origin
      */
     #position = new Vector2( 0.0, 0.0 );
-    #velocity = new Vector2( 10.0, 10.0 );
+    #velocity = new Vector2( 0.0, 0.0 );
     // #acceleration = new Vector2( 0.0, 0.0 );
     #config = {
         labelPoints: true,
