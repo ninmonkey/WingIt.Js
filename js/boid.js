@@ -3,6 +3,12 @@ import { toDegrees, toRadians } from './utils.js';
 export class Vector2 {
     /**
      * @description Represents a 2D vector
+     * @property x {number} x coordinate
+     * @property y {number} y coordinate
+     * @property Position {Object} shorthand for getting/setting both x and y as an object
+     * @method Add {function} vector addition, returns a new Vector2 instance
+     * @method fromCoord {function} set x,y from two numbers
+     * @method fromVector {function} set x,y from another Vector2 or object with numeric x,y properties
      * @todo Add vector operations (.fromAngle, fromVector, add, dot/cross/scalar product, normalize, etc.)
      */
     #x = 0
@@ -17,16 +23,11 @@ export class Vector2 {
     get y () { return this.#y; }
     get Position () { return { x: this.#x, y: this.#y }; }
     set Position ( newPos ) {
-        // ignore value isn't a vector?
-        // const [ x, y ] = newPos
+        // warn if value isn't a vector?
         const x = newPos.x
         const y = newPos.y
-        if ( x !== undefined ) { this.#x = x; }
-        if ( y !== undefined ) { this.#y = y; }
-        // if( newPos instanceof Vector2 ) {
-        //     this.#x = newPos.x;
-        //     this.#y = newPos.y;
-        // }
+        if ( x !== undefined && typeof x === 'number' ) { this.#x = x; }
+        if ( y !== undefined && typeof y === 'number' ) { this.#y = y; }
     }
 
     Add ( vector ) {
