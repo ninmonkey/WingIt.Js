@@ -6,9 +6,17 @@ export class Vector2 {
      * @property x {number} x coordinate
      * @property y {number} y coordinate
      * @property Position {Object} shorthand for getting/setting both x and y as an object
-     * @method Add {function} vector addition, returns a new Vector2 instance
+     * @method add {function} vector addition, returns a new Vector2 instance
+     * @method clone {function} returns a new Vector2 instance with the same x and y values
+     * @method fromAngle {function} set x,y from angle (radians) and distance
      * @method fromCoord {function} set x,y from two numbers
      * @method fromVector {function} set x,y from another Vector2 or object with numeric x,y properties
+     * @method limit {function} limit the magnitude of the vector to a maximum value
+     * @method magnitude {function} get the length of the vector
+     * @method normalize {function} make the vector a unit vector (length of 1)
+     * @method scale {function} scale the vector in-place by a scalar value
+     * @method subtract {function} vector subtraction, returns a new Vector2 instance
+     * @method toString {function} returns a string representation of the vector
      * @todo Add vector operations (.fromAngle, fromVector, add, dot/cross/scalar product, normalize, etc.)
      */
     #x = 0
@@ -144,6 +152,7 @@ export class Vector2 {
     clone () {
         /**
          * @description Returns a new Vector2 instance with the same x and y values. for when you don't want to mutate a chain.
+         * @returns {Vector2} A new Vector2 instance
          */
         return new Vector2( this.#x, this.#y );
     }

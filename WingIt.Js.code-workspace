@@ -8,7 +8,11 @@
     "settings": {
         "livePreview.autoRefreshPreview": "On Changes to Saved Files",
         "livePreview.previewDebounceDelay": 20,
-        "livePreview.defaultPreviewPath": "/examples/basic.bounce.html",
+        // "livePreview.customExternalBrowser": "Default",
+        // "livePreview.debugOnExternalPreview": false,
+        // "livePreview.defaultPreviewPath": "/examples/basic.bounce.html",
+        "livePreview.defaultPreviewPath": "/examples/seek-mouse.html",
+        "livePreview.portNumber": 3004,
         "[javascript]": {
             "editor.maxTokenizationLineLength": 2500,
             // "editor.codeLens": false,
@@ -48,7 +52,7 @@
                 "type": "chrome",
                 "name": "WingIt.js ⁞ 🐛 Attach to External Preview",
                 "request": "launch",
-                "url": "http://127.0.0.1:3000/examples/seek-mouse.html",
+                "url": "http://127.0.0.1:3004/examples/seek-mouse.html",
                 "presentation": {
                     "hidden": false,
                     "group": "0",
