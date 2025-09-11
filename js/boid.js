@@ -30,6 +30,28 @@ export class Vector2 {
         if ( y !== undefined && typeof y === 'number' ) { this.#y = y; }
     }
 
+    normalize () {
+        /**
+         * @summary Modifies the vector to be a unit vector. ( where length == 1 )
+         * @returns {Vector2} current instance after normalizing it
+         */
+        const magnitude = this.magnitude()
+        if ( magnitude === 0 ) {
+            return new Vector2( 0, 0 )
+        }
+        this.fromVector( new Vector2( this.#x / magnitude, this.#y / magnitude ) )
+        return this
+    }
+
+    magnitude () {
+        /**
+         * @description Returns the magnitude (length) of the vector
+         * @returns {number} The magnitude of the vector
+         */
+        // I didn't make it a property to make the extra sqrt cost more obvious
+        return Math.sqrt( this.#x * this.#x + this.#y * this.#y )
+    }
+
     Add ( vector ) {
         /**
          * @description Vector operation for addition. returns a new Vector2 instance / immutable
@@ -239,5 +261,36 @@ export function BounceScreenEdge ( entities, canvas ) {
             if ( ent.Velocity.y > 0 ) { ent.Velocity.y *= -1 }
         }
         ent.Position.fromVector( newPos )
+    }
+}
+
+export function debugLogBoidStates ( entityList, mode = 'table' ) {
+    let i = 0
+    for ( const ent of entityList ) {
+        if( ! ( ent instanceof Boid ) ) {
+            console.warn( `debugLogBoidStates: entityList[ ${i} ] was not a Boid instance!` )
+            console.debug( { index: i,  unexpectedItem: ent })
+            i++
+            continue
+        }
+
+        const str = `Pos: ${ ent.Position.toString() } Vel: ${ ent.Velocity.toString() }`
+        if ( mode === 'table' ) {
+            console.table( {
+                id: i++,
+                velocityMagnitude: ent.Velocity.magnitude().toFixed( 2 ),
+                boid: str,
+            } );
+            continue
+        }
+
+        console.log( {
+            id: i++,
+            velocityMagnitude: new Number( ent.Velocity.magnitude().toFixed( 2 ) ),
+            velocity: ent.Velocity,
+            position: ent.Position,
+            boid: ent,
+            str: str,
+        } );
     }
 }
