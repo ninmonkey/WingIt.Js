@@ -52,6 +52,18 @@ export class Vector2 {
         return Math.sqrt( this.#x * this.#x + this.#y * this.#y )
     }
 
+    scale( scalar ) {
+        /**
+         * @summary Scales the vector in-place by the given scalar value
+         * @param scalar {number}
+         * @returns {Vector2} current instance after scaling it
+         * @example boid.Velocity.normalize().scale( 3 )
+         */
+        this.#x *= scalar;
+        this.#y *= scalar;
+        return this;
+    }
+
     Add ( vector ) {
         /**
          * @description Vector operation for addition. returns a new Vector2 instance / immutable
