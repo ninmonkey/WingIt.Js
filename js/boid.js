@@ -67,13 +67,24 @@ export class Vector2 {
     add ( vector ) {
         /**
          * @description Vector operation for addition. returns a new Vector2 instance / immutable
-         * @param vector {Vector2} another Vector2 instance
+         * @param vector {Vector2} other Vector2 instance
          * @example const newPos = boid.Position.add( boid.Velocity ) // returns the new vector without changing `boid.Position`
          */
         if ( !( vector instanceof Vector2 ) ) {
             throw new Error( 'Vector2.Add requires a Vector2 as an argument' )
         }
         return new Vector2( this.#x + vector.x, this.#y + vector.y )
+    }
+    subtract( vector ) {
+        /**
+         * @description Vector operation for subtraction. returns a new Vector2 instance / immutable
+         * @param vector {Vector2} other Vector2 instance. ( this - other )
+         * @example boid.Position.subtract( other.Position )
+         */
+        if ( !( vector instanceof Vector2 ) ) {
+            throw new Error( 'Vector2.Subtract requires a Vector2 as an argument' )
+        }
+        return new Vector2( this.#x - vector.x, this.#y - vector.y )
     }
     fromCoord ( x, y ) {
         /**
@@ -116,6 +127,25 @@ export class Vector2 {
         this.#x = Math.cos( angle ) * distance;
         this.#y = Math.sin( angle ) * distance;
         return this;
+    }
+
+    limit ( maxMagnitude ) {
+        /**
+         * @summary Limits the magnitude of the vector to the given maximum value
+         * @param {number} maxMagnitude The maximum magnitude to limit to
+         * @returns {Vector2} The current instance after limiting the magnitude
+         */
+        const curMagnitude = this.magnitude()
+        const truncatedMag = Math.min( curMagnitude, maxMagnitude )
+        this.normalize().scale( truncatedMag )
+        return this;
+    }
+
+    clone () {
+        /**
+         * @description Returns a new Vector2 instance with the same x and y values. for when you don't want to mutate a chain.
+         */
+        return new Vector2( this.#x, this.#y );
     }
 
     toString () {
