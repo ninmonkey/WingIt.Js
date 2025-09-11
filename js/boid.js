@@ -64,7 +64,7 @@ export class Vector2 {
         return this;
     }
 
-    Add ( vector ) {
+    add ( vector ) {
         /**
          * @description Vector operation for addition. returns a new Vector2 instance / immutable
          * @param vector {Vector2} another Vector2 instance
@@ -263,7 +263,7 @@ export function BounceScreenEdge ( entities, canvas ) {
         const newX = ent.Position.x + ent.Velocity.x  // * timestamp
         const newY = ent.Position.y + ent.Velocity.y  // * timestamp
 
-        const newPos = ent.Position.Add( ent.Velocity )
+        const newPos = ent.Position.add( ent.Velocity )
         const isOnScreen = TestIsOnScreen( newPos, ent.Radius * 0, canvas ) // 0 tests center coord, (ent.Radius * 2) tests outside, etc...
         if ( isOnScreen ) {
             ent.Position.fromVector( newPos )
