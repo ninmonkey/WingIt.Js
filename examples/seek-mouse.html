@@ -9,27 +9,62 @@
 </head>
 
 <body>
-    <!-- <section>
+    <section>
         <nav>
             <ul>
                 <li><a href="./">Go Back</a></li>
-                <li><a href="#" id="cmd-btn-toggle-grid-large">Large / Small</a></li>
+                <!-- <li><a href="#" id="cmd-btn-toggle-grid-large">Large / Small</a></li> -->
             </ul>
         </nav>
-    </section> -->
+    </section>
     <h1>Seek Mouse Clicks Behavior: using constant acceleration</h1>
     <section id="cmd-bar">
         <button id="btn-draw-vector">Show Vectors</button>
-        <label for="max-init-velocity">Choose a maximum house max-init-velocity: </label>
+        <button id="btn-disable-steer">Disable Steering</button>
+        <br/>
+        <label for="max-init-velocity">Maximum initial velocity: </label>
 <input
         type  = "range"
         name  = "max-init-velocity"
         id    = "max-init-velocity"
-        max   = "0.1"
+        max   = "7"
         min   = "0.00001"
         step  = "0.00001"
-        value = "0.01" />
+        value = "3.4" />
 <output class = "max-init-velocity-output" for = "max-init-velocity"></output>
+        <!-- value = 1.8, "0.01" /> -->
+        <br/>
+        <label for="max-steer-force">Max Steering: </label>
+<input
+        type  = "range"
+        name  = "max-steer-force"
+        id    = "max-steer-force"
+        max   = "5.0"
+        min   = "0.0000001"
+        step  = "0.000001"
+        value = "4.0" />
+        <!-- value: 2.8, 0.1, 0.00001 -->
+
+
+<output class = "max-steer-force-output" for = "max-steer-force"></output>
+        <br/>
+        <label for="max-velocity-force">Max Velocity: </label>
+<input
+        type  = "range"
+        name  = "max-velocity-force"
+        id    = "max-velocity-force"
+        max   = "3"
+        min   = "0.0000001"
+        step  = "0.00001"
+        value = "2.0" />
+
+        <!-- value:  1.5, 0.1, 0.00001 -->
+
+<output class = "max-velocity-force-output" for = "max-velocity-force"></output>
+<!-- 0.00001
+ 0.0001
+ 0.001
+ 0.01 -->
     </section>
     <section class="canvas-parent parent-context grid-small">
 
@@ -57,6 +92,8 @@
             lastMousePos: new Vector2( 200, 200 ),
             maxSteerForce: 0.02,
             spawnMaxVelocity: 0.01,
+            maxVelocityForce: 0.1,
+            disableSeeking: false,
         }
         window.bag ??= {}
         window.toDeg = toDegrees
@@ -139,26 +176,6 @@
             debugLogBoidStates( entityList, 'table' )
             requestAnimationFrame( updateGameStep )
         }
-        window.addEventListener( "load", InitializePage )
-
-        // sync initial state
-        document.getElementById( 'btn-draw-vector' ).textContent = appConfig.drawVectors ? 'Hide Vectors' : 'Show Vectors'
-        const input_maxInitVelocity = document.getElementById( 'max-init-velocity' )
-        const output_maxInitVelocity = document.querySelector( '.max-init-velocity-output' )
-
-        output_maxInitVelocity.textContent = input_maxInitVelocity.value;
-
-        input_maxInitVelocity.addEventListener( "input", () => {
-          output_maxInitVelocity.textContent = input_maxInitVelocity.value;
-          appConfig.spawnMaxVelocity = parseFloat( input_maxInitVelocity.value )
-          InitializePage()
-        });
-
-        document.getElementById( 'btn-draw-vector' ).addEventListener( 'click', ( e ) => {
-            appConfig.drawVectors = ! appConfig.drawVectors
-            e.target.textContent = appConfig.drawVectors ? 'Hide Vectors' : 'Show Vectors'
-        } )
-
         function updateGameStep ( timestamp ) {
             // todo: ensure timestep is increased by a fixed timestep to ensure stable physics simulations
             if ( start === undefined ) {
@@ -166,10 +183,16 @@
             }
             const elapsed = timestamp - start;
             const timestepMod = ( elapsed ) / 1000
+            const maxVel = appConfig.maxVelocityForce
 
             for ( const b of entityList ) {
                 const steer = calculateSeekForce( b, appConfig.lastMousePos )
-                b.Steer.fromVector( steer )
+                b.Steer.fromVector( steer.limit(0.001) )  //.limit( 0.00001 )
+                b.Velocity.fromVector( b.Velocity.limit( maxVel ) )
+
+                if( appConfig.disableSeeking == true ) {
+                    b.Steer.fromCoord( 0.0, 0.0 )
+                }
                 b.update()
             }
             BounceScreenEdge( entityList, canvas )
@@ -181,9 +204,10 @@
 
 
         function calculateSeekForce( boid, target ) {
-            const boid_maxSteer = appConfig.maxSteerForce || 0.02
+            const boid_maxSteer = appConfig.maxSteerForce || 0.0001
             const desired = target.clone()
                 .subtract( boid.Position )
+                // .normalize()
                 .limit( boid_maxSteer )
                 // .normalize().scale( boid_maxSteer )
 
@@ -191,6 +215,55 @@
             const steer = desired
             return steer
         }
+
+        // section: register events
+        window.addEventListener( "load", InitializePage )
+        canvas.addEventListener( 'click', ( e ) => {
+            InitializePage()
+        } )
+        document.getElementById( 'btn-draw-vector' ).textContent = appConfig.drawVectors ? 'Hide Vectors' : 'Show Vectors'
+        document.getElementById( 'btn-disable-steer' ).textContent = appConfig.disableSeeking ? 'Enable Steering' : 'Disable Steering'
+
+        const input_maxInitVelocity = document.getElementById( 'max-init-velocity' )
+        const output_maxInitVelocity = document.querySelector( '.max-init-velocity-output' )
+        const input_steerForce = document.getElementById( 'max-steer-force' )
+        const output_steerForce = document.querySelector( '.max-steer-force-output' )
+        const input_velocityForce = document.getElementById( 'max-velocity-force' )
+        const output_velocityForce = document.querySelector( '.max-velocity-force-output' )
+
+        // sync initial text states
+        output_maxInitVelocity.textContent = input_maxInitVelocity.value;
+        output_steerForce.textContent = input_steerForce.value;
+        output_velocityForce.textContent = input_velocityForce.value;
+        appConfig.maxSteerForce = parseFloat( input_steerForce.value )
+        appConfig.maxVelocityForce = parseFloat( input_velocityForce.value )
+        appConfig.maxSteerForce = parseFloat( input_steerForce.value )
+
+        input_velocityForce.addEventListener( "input", () => {
+          output_velocityForce.textContent = input_velocityForce.value;
+          appConfig.maxVelocityForce = parseFloat( input_velocityForce.value )
+          InitializePage()
+        })
+
+        input_maxInitVelocity.addEventListener( "input", () => {
+          output_maxInitVelocity.textContent = input_maxInitVelocity.value;
+          appConfig.spawnMaxVelocity = parseFloat( input_maxInitVelocity.value )
+          InitializePage()
+        })
+        input_steerForce.addEventListener( "input", () => {
+          output_steerForce.textContent = input_steerForce.value;
+          appConfig.maxSteerForce = parseFloat( input_steerForce.value )
+          InitializePage()
+        })
+
+        document.getElementById( 'btn-draw-vector' ).addEventListener( 'click', ( e ) => {
+            appConfig.drawVectors = ! appConfig.drawVectors
+            e.target.textContent = appConfig.drawVectors ? 'Hide Vectors' : 'Show Vectors'
+        } )
+        document.getElementById( 'btn-disable-steer' ).addEventListener( 'click', ( e ) => {
+            appConfig.disableSeeking = ! appConfig.disableSeeking
+            e.target.textContent = appConfig.disableSeeking ? 'Enable Steering' : 'Disable Steering'
+        } )
 
         canvas.addEventListener( 'mousemove', ( e ) => {
             const rect = canvas.getBoundingClientRect()
@@ -213,7 +286,7 @@
                 // const steer = desired_velocity.clone()
                 //     .subtract( b.Velocity )
                 //     .limit( 0.1 ) // max force
-                const steer = target
+                // const steer = target
                 // b.Steer.fromVector( steer )
 /*
     desired_velocity = normalize (position -
