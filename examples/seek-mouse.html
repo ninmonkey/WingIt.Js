@@ -44,7 +44,9 @@
             spawnWithMass: false, // does random velocity takes radius into account?
             alwaysClearScreen: true,
             drawVectors: true,
-            lastMousePos: new Vector2()
+            lastMousePos: new Vector2( 200, 200 ),
+            maxSteerForce: 0.02,
+            spawnMaxVelocity: 0.01,
         }
         window.bag ??= {}
         window.toDeg = toDegrees
@@ -80,31 +82,26 @@
                 ent.draw( ctx )
                 // drawVector( ctx, { x: 10, y: 10  }, toRadians( -90 ), 10, 'green' )
             }
+
+            // draw target
+              ctx.beginPath();
+
+            // ctx.fillStyle = 'red'
+            ctx.strokeStyle = 'hsl(200 100% 50% / .75)'
+            ctx.fillStyle = 'hsl(10 30% 50% / .7'
+            ctx.lineWidth = 4
+            ctx.strokeStyle = 'hsl(0 0% 0% / 0.3)'
+            ctx.arc( appConfig.lastMousePos.x, appConfig.lastMousePos.y, 10,
+                /* startAngle */ 0, /* end angle */  Math.PI * 2, true );
+            ctx.stroke()
+            ctx.fill()
+
         }
-
-        function updateGameStep ( timestamp ) {
-            // todo: ensure timestep is increased by a fixed timestep to ensure stable physics simulations
-            if ( start === undefined ) {
-                start = timestamp;
-            }
-            const elapsed = timestamp - start;
-            const timestepMod = ( elapsed ) / 1000
-
-            for ( const b of entityList ) {
-                b.update()
-            }
-            BounceScreenEdge( entityList, canvas )
-
-            drawCanvas()
-            // console.info(timestamp)
-            requestAnimationFrame( updateGameStep )
-        }
-
         function InitializePage () {
             // updateGameStep()
             let i
             const randAngle = randomAngle()
-            const maxVel = 4
+            const maxVel = appConfig.spawnMaxVelocity ?? .003
 
             for ( i = 0; i < appConfig.spawnCount; i++ ) {
                 const b = new Boid()
@@ -139,27 +136,63 @@
             appConfig.drawVectors = ! appConfig.drawVectors
             e.target.textContent = appConfig.drawVectors ? 'Hide Vectors' : 'Show Vectors'
         } )
+
+        function updateGameStep ( timestamp ) {
+            // todo: ensure timestep is increased by a fixed timestep to ensure stable physics simulations
+            if ( start === undefined ) {
+                start = timestamp;
+            }
+            const elapsed = timestamp - start;
+            const timestepMod = ( elapsed ) / 1000
+
+            for ( const b of entityList ) {
+                const steer = calculateSeekForce( b, appConfig.lastMousePos )
+                b.Steer.fromVector( steer )
+                b.update()
+            }
+            BounceScreenEdge( entityList, canvas )
+
+            drawCanvas()
+            // console.info(timestamp)
+            requestAnimationFrame( updateGameStep )
+        }
+
+
+        function calculateSeekForce( boid, target ) {
+            const boid_maxSteer = appConfig.maxSteerForce || 0.02
+            const desired = target.clone()
+                .subtract( boid.Position )
+                .limit( boid_maxSteer )
+                // .normalize().scale( boid_maxSteer )
+
+            // const steer = desired.subtract( boid.Velocity ).limit( 0.1 ) // boid.MaxForce )
+            const steer = desired
+            return steer
+        }
+
         canvas.addEventListener( 'mousemove', ( e ) => {
             const rect = canvas.getBoundingClientRect()
             const mouseX = e.clientX - rect.left
             const mouseY = e.clientY - rect.top
             const mousePos = new Vector2(mouseX, mouseY)
-            mousePos.fromCoord( 100, 100 )
+            // mousePos.fromCoord( 100, 100 )
             const desired = mousePos.clone()
+
+            appConfig.lastMousePos = mousePos
 
 
             for ( const b of entityList ) {
                 const target = mousePos.clone()
-                const desired_velocity = target
-                    .subtract( b.Position )
-                    .normalize()
-                    .scale( 0.5 ) // max speed
+                // const desired_velocity = target
+                //     .subtract( b.Position )
+                //     .normalize()
+                //     .scale( 0.5 ) // max speed
 
-                const steer = desired_velocity.clone()
-                    .subtract( b.Velocity )
-                    .limit( 0.1 ) // max force
-
-                b.Steer.fromVector( steer )
+                // const steer = desired_velocity.clone()
+                //     .subtract( b.Velocity )
+                //     .limit( 0.1 ) // max force
+                const steer = target
+                // b.Steer.fromVector( steer )
 /*
     desired_velocity = normalize (position -
         target) * max_speed
