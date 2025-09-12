@@ -73,7 +73,7 @@
     </section>
 
     <script type="module">
-        import { randomInt, randomNumber, toDegrees, toRadians, randomAngle, randomAngleOffset } from './../../js/utils.js';
+        import { randomInt, randomNumber, toDegrees, toRadians, randomAngle, randomAngleOffset } from './../js/utils.js';
         import {
             Boid,
             BounceScreenEdge,
@@ -81,8 +81,8 @@
             TestIsOnScreen,
             Vector2,
             WrapScreenEdge,
-        } from './../../js/boid.js';
-        import { labelPoint, drawVector, drawVectorAngle } from './../../js/drawing.js';
+        } from './../js/boid.js';
+        import { labelPoint, drawVector, drawVectorAngle } from './../js/drawing.js';
         // globals
         const appConfig = {
             spawnCount: 7,
@@ -204,7 +204,7 @@
 
 
         function calculateSeekForce( boid, target ) {
-            const boid_maxSteer = appConfig.maxSteerForce || 0.0001
+            const boid_maxSteer = appConfig.maxSteerForce ?? 0.0001
             const desired = target.clone()
                 .subtract( boid.Position )
                 // .normalize()
