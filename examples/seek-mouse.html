@@ -17,7 +17,10 @@
             </ul>
         </nav>
     </section> -->
-    <h1>Seek Mouse Behavior</h1>
+    <h1>Seek Mouse Clicks Behavior: using constant acceleration</h1>
+    <section id="cmd-bar">
+        <button id="btn-draw-vector">Show Vectors</button>
+    </section>
     <section class="canvas-parent parent-context grid-small">
 
         <canvas id="canvas" width="800px" height="600px"></canvas>
@@ -40,6 +43,8 @@
             spawnCount: 7,
             spawnWithMass: false, // does random velocity takes radius into account?
             alwaysClearScreen: true,
+            drawVectors: true,
+            lastMousePos: new Vector2()
         }
         window.bag ??= {}
         window.toDeg = toDegrees
@@ -52,7 +57,8 @@
         const color_clear_canvas = "#464746";
         const color_boid_fill = "rgb(27, 151, 182)";
         const color_velocity = 'rgb(27 151 182 / .6)'
-        const color_steer = 'rgb(160 100 100 / .6)'
+        const color_steer = 'rgb(160 100 100 / .9)'
+
         let start
 
         function drawCanvas () {
@@ -61,8 +67,16 @@
             }
 
             for ( const ent of entityList ) {
-                drawVectorAngle( ctx, ent.Position, toRadians( 45 ), 70, color_velocity ) // heading
-                drawVectorAngle( ctx, ent.Position, toRadians( 45 ), 60, color_steer ) // heading
+                if( appConfig.drawVectors ) {
+                    const drawVel = ent.Velocity.clone().scale(50).limit(100)
+                    const drawSteer = ent.Steer.clone().normalize().scale(50).limit(100)
+                    drawVector( ctx, ent.Position, drawSteer, color_steer ) // steering
+                    drawVector( ctx, ent.Position, drawVel, color_velocity ) // velocity
+                }
+                // drawVector( ctx, ent.Position, relPos, color_velocity ) // velocity
+                // drawVector( ctx, ent.Position, ent.Velocity.angle(), ent.Velocity.magnitude() * 10, color_velocity ) // velocity
+                // drawVectorAngle( ctx, ent.Position, toRadians( 45 ), 70, color_velocity ) // heading
+                // drawVectorAngle( ctx, ent.Position, toRadians( 45 ), 60, color_steer ) // heading
                 ent.draw( ctx )
                 // drawVector( ctx, { x: 10, y: 10  }, toRadians( -90 ), 10, 'green' )
             }
@@ -118,10 +132,53 @@
             requestAnimationFrame( updateGameStep )
         }
         window.addEventListener( "load", InitializePage )
+
+        // sync initial state
+        document.getElementById( 'btn-draw-vector' ).textContent = appConfig.drawVectors ? 'Hide Vectors' : 'Show Vectors'
+        document.getElementById( 'btn-draw-vector' ).addEventListener( 'click', ( e ) => {
+            appConfig.drawVectors = ! appConfig.drawVectors
+            e.target.textContent = appConfig.drawVectors ? 'Hide Vectors' : 'Show Vectors'
+        } )
         canvas.addEventListener( 'mousemove', ( e ) => {
             const rect = canvas.getBoundingClientRect()
             const mouseX = e.clientX - rect.left
             const mouseY = e.clientY - rect.top
+            const mousePos = new Vector2(mouseX, mouseY)
+            mousePos.fromCoord( 100, 100 )
+            const desired = mousePos.clone()
+
+
+            for ( const b of entityList ) {
+                const target = mousePos.clone()
+                const desired_velocity = target
+                    .subtract( b.Position )
+                    .normalize()
+                    .scale( 0.5 ) // max speed
+
+                const steer = desired_velocity.clone()
+                    .subtract( b.Velocity )
+                    .limit( 0.1 ) // max force
+
+                b.Steer.fromVector( steer )
+/*
+    desired_velocity = normalize (position -
+        target) * max_speed
+        steering = desired_velocity - velocity
+*/
+                // const desired = mousePos.clone()
+                //     .subtract( b.Position )
+                //     .normalize()
+                //     .scale( 0.5 ) // max speed
+                // b.Steer.fromCoord( -10, 10 ).normalize().scale(  1 )
+
+                // const steer = mousePos.clone()
+                // //     .subtract( b.Velocity )
+                // //     .limit( 0.1 ) // max force
+
+                // b.Steer.fromVector( steer )
+                // b.Velocity.add( steer )
+                // b.Velocity.limit( 3 ) // max speed
+            }
             // console.log( { mouseX, mouseY } )
 
             // console.info( { kind: 'mousemove', evt: e, mouseX, mouseY } )

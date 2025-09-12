@@ -29,13 +29,13 @@ export function labelPoint ( ctx, p, options  = {} ) {
     ctx.fillText( `(${ x }, ${ y })`, p.x + config.offset, p.y + config.offset );
 }
 
-export function drawVector( ctx, pos, end, color = 'rgb(27 151 182 / .6)' ) {
+export function drawVector( ctx, pos, relativeVector, color = 'rgb(27 151 182 / .6)' ) {
     /**
      * @summary Draws a line from (x0, y0) to (angle, length)
      */
     ctx.beginPath()
     ctx.moveTo( pos.x, pos.y )
-    ctx.lineTo( pos.x + end.x, pos.y + end.y )
+    ctx.lineTo( pos.x + relativeVector.x, pos.y + relativeVector.y )
     ctx.strokeStyle = color
     ctx.lineWidth = 2
     ctx.stroke()
