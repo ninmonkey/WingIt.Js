@@ -34,7 +34,7 @@
             Vector2,
             WrapScreenEdge,
         } from './../../js/boid.js';
-        // import { labelPoint } from './../../js/drawing.js';
+        import { labelPoint, drawVector, drawVectorAngle } from './../../js/drawing.js';
         // globals
         const appConfig = {
             spawnCount: 7,
@@ -51,6 +51,9 @@
         const ctx = canvas.getContext( "2d" );
         const color_clear_canvas = "#464746";
         const color_boid_fill = "rgb(27, 151, 182)";
+        const color_velocity = 'rgb(27 151 182 / .6)'
+        const color_steer = 'rgb(160 100 100 / .6)'
+        let start
 
         function drawCanvas () {
             if ( appConfig.alwaysClearScreen ) {
@@ -58,10 +61,12 @@
             }
 
             for ( const ent of entityList ) {
+                drawVectorAngle( ctx, ent.Position, toRadians( 45 ), 70, color_velocity ) // heading
+                drawVectorAngle( ctx, ent.Position, toRadians( 45 ), 60, color_steer ) // heading
                 ent.draw( ctx )
+                // drawVector( ctx, { x: 10, y: 10  }, toRadians( -90 ), 10, 'green' )
             }
         }
-        let start
 
         function updateGameStep ( timestamp ) {
             // todo: ensure timestep is increased by a fixed timestep to ensure stable physics simulations
@@ -71,6 +76,9 @@
             const elapsed = timestamp - start;
             const timestepMod = ( elapsed ) / 1000
 
+            for ( const b of entityList ) {
+                b.update()
+            }
             BounceScreenEdge( entityList, canvas )
 
             drawCanvas()
@@ -100,6 +108,9 @@
                     if ( b.Radius > 20 ) { b.Velocity.scale( 0.3 ) } else { b.Velocity.scale( 4 ) }
                 }
 
+                b.Steer.fromAngle( toRadians( 0 ), 1 )
+                b.Steer.fromCoord( 0, 0 )
+
                 entityList.push( b )
             }
             console.info( `spawned ${i} boids` )
@@ -113,7 +124,7 @@
             const mouseY = e.clientY - rect.top
             // console.log( { mouseX, mouseY } )
 
-            console.info( { kind: 'mousemove', evt: e, mouseX, mouseY } )
+            // console.info( { kind: 'mousemove', evt: e, mouseX, mouseY } )
             // for ( const b of entityList ) {
             //     const desired = new Vector2().fromCoord( mouseX, mouseY )
             //         .subtract( b.Position )

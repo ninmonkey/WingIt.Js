@@ -1,3 +1,5 @@
+import { Vector2 } from './boid.js';
+
 export function labelPoint ( ctx, p, options  = {} ) {
     /**
      * @description Labels coordinates on the canvas
@@ -25,4 +27,28 @@ export function labelPoint ( ctx, p, options  = {} ) {
     ctx.font      = config.font
     ctx.fillStyle = config.fillStyle
     ctx.fillText( `(${ x }, ${ y })`, p.x + config.offset, p.y + config.offset );
+}
+
+export function drawVector( ctx, pos, end, color = 'rgb(27 151 182 / .6)' ) {
+    /**
+     * @summary Draws a line from (x0, y0) to (angle, length)
+     */
+    ctx.beginPath()
+    ctx.moveTo( pos.x, pos.y )
+    ctx.lineTo( pos.x + end.x, pos.y + end.y )
+    ctx.strokeStyle = color
+    ctx.lineWidth = 2
+    ctx.stroke()
+}
+export function drawVectorAngle( ctx, pos, angle, length = 50, color = 'rgb(27 151 182 / .6)' ) {
+    /**
+     * @summary Draws a line from (x0, y0) to (x1, y1)
+     */
+    const end = (new Vector2()).fromAngle( angle, length )
+    ctx.beginPath()
+    ctx.moveTo( pos.x, pos.y )
+    ctx.lineTo( pos.x + end.x, pos.y + end.y )
+    ctx.strokeStyle = color
+    ctx.lineWidth = 2
+    ctx.stroke()
 }

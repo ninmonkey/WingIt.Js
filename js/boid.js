@@ -206,6 +206,7 @@ export class Boid {
      */
     #position = new Vector2( 0.0, 0.0 );
     #velocity = new Vector2( 0.0, 0.0 );
+    #steer = new Vector2( 0.0, 0.0 );
     // #acceleration = new Vector2( 0.0, 0.0 );
     #config = {
         labelPoints: true,
@@ -221,6 +222,7 @@ export class Boid {
     //     }
     get Position () { return this.#position; }
     get Velocity () { return this.#velocity; }
+    get Steer () { return this.#steer; }
     // get Acceleration () { return this.#acceleration; }
 
     draw ( context ) {
@@ -271,6 +273,14 @@ export class Boid {
         }
     }
 
+    update ( ) { // timestamp ) {
+        /**
+         * @description Update `Velocity` by accelerating using the `Steer`-ing force
+         */
+        this.#velocity.fromVector(
+            this.#velocity.add(this.#steer) )
+    }
+
     toString () {
         return `Boid( Position: ${ this.#position.toString() }, Velocity: ${ this.#velocity.toString() } )`;
     }
@@ -291,7 +301,7 @@ export class Boid {
     }
 }
 
-export function BounceScreenEdge ( entities, canvas ) {
+export function BounceScreenEdge ( entities, canvas ) { // , timestepMod = 1.0 ) {
     /**
      * @summary Bounce boids off edges of canvas to keep them in bounds
      * @param entities {Array<Boid>} array of Boid instances
@@ -299,8 +309,8 @@ export function BounceScreenEdge ( entities, canvas ) {
      * @description this uses center coordinates for circles
      */
     for ( const ent of entities ) {
-        const newX = ent.Position.x + ent.Velocity.x  // * timestamp
-        const newY = ent.Position.y + ent.Velocity.y  // * timestamp
+        const newX = ent.Position.x + ent.Velocity.x // * timestepMod
+        const newY = ent.Position.y + ent.Velocity.y // * timestepMod
 
         const newPos = ent.Position.add( ent.Velocity )
         const isOnScreen = TestIsOnScreen( newPos, ent.Radius * 0, canvas ) // 0 tests center coord, (ent.Radius * 2) tests outside, etc...
@@ -336,7 +346,7 @@ export function debugLogBoidStates ( entityList, mode = 'table' ) {
             continue
         }
 
-        const str = `Pos: ${ ent.Position.toString() } Vel: ${ ent.Velocity.toString() }`
+        const str = `Pos: ${ ent.Position.toString() } Vel: ${ ent.Velocity.toString() } Steer: ${ ent.Steer.toString() }`
         if ( mode === 'table' ) {
             console.table( {
                 id: i++,
@@ -351,6 +361,7 @@ export function debugLogBoidStates ( entityList, mode = 'table' ) {
             velocityMagnitude: new Number( ent.Velocity.magnitude().toFixed( 2 ) ),
             velocity: ent.Velocity,
             position: ent.Position,
+            steer: ent.Steer,
             boid: ent,
             str: str,
         } );
